@@ -1,0 +1,147 @@
+﻿@model IEnumerable<EF.Models.Product>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Product List</h2>
+
+<div class="d-flex align-items-center justify-content-between my-4">
+    <p class="mb-0">
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
+    </p>
+
+    <form action="/products/index" class="d-flex">
+        <input value="@ViewBag.search" name="search" class="form-control me-2 shadow-none" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+</div>
+
+@{ 
+    string currentSorby = "";
+    string sortIconClass = "";
+
+    if (ViewBag.sortBy == "asc") {
+        currentSorby = "desc";
+        sortIconClass = "bxs-up-arrow";
+    } else {
+        currentSorby = "asc";
+        sortIconClass = "bxs-down-arrow";
+    }
+}
+
+<table class="table">
+    <tr>
+        <th>
+            <a href="/products/index?sortColumn=ProductID&Sortby=@currentSorby&page=1">
+                ProductID
+                @{ if (ViewBag.sortColumn == "ProductID")
+                   {
+                        <i class="bx @sortIconClass"></i>
+                   } 
+                }
+            </a>
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Price)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateOfPurchase)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Status)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Category.CategoryName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Brand.BrandName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Active)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.ProductID)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.ProductName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Price)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.DateOfPurchase)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Status)
+    </td>
+
+    @* display name by id (cateId, brandId) -> (CateName, BrandName)  *@
+    <td>
+        @Html.DisplayFor(modelItem => item.Category.CategoryName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Brand.BrandName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Active)
+    </td>
+    <td>
+        @Html.ActionLink("Edit", "Edit", new { id = item.ProductID }) |
+        @Html.ActionLink("Details", "Details", new { id = item.ProductID }) |
+        @Html.ActionLink("Delete", "Delete", new { id = item.ProductID })
+    </td>
+</tr>
+}
+
+</table>
+
+<nav class="w-100 d-flex justify-content-center" aria-label="Page navigation example">
+    @{
+        bool isDisabledPrev = false;
+        bool isDisabledNext = false;
+        int prevPage = ViewBag.currentPage - 1;
+        int nextPage = ViewBag.currentPage + 1;
+
+
+        if (prevPage <= 0)
+        {
+            isDisabledPrev = true;
+        }
+
+        if (nextPage > ViewBag.pageSize)
+        {
+            isDisabledNext = true;
+        }
+    }
+    <ul class="pagination">
+
+        <li class="page-item @(isDisabledPrev ? "disabled" : "")">
+            <a class="page-link" href="/products/index?sortColumn=@ViewBag.sortColumn&Sortby=@ViewBag.sortBy&page=@prevPage">Previous</a>
+        </li>
+
+        @for (int i = 1; i <= ViewBag.pageSize; i++)
+        {
+            bool isActive = i == ViewBag.currentPage;
+
+            <li class="page-item @(isActive ? "active" : "")">
+                <a class="page-link" href="/products/index?sortColumn=@ViewBag.sortColumn&Sortby=@ViewBag.sortBy&page=@i">
+                    @i
+                </a>
+            </li>
+        }
+
+        <li class="page-item @(isDisabledNext ? "disabled" : "")">
+            <a class="page-link" href="/products/index?sortColumn=@ViewBag.sortColumn&Sortby=@ViewBag.sortBy&page=@nextPage">Next</a>
+        </li>
+    </ul>
+</nav>
